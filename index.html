@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시장 환경 종합 진단</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>시장 환경 종합 진단</h1>
+            <p>5지표 신호등 기반의 시장 상태 분석 및 투자 전략 가이드</p>
+        </header>
+
+        <div class="top-section">
+            <div class="overall-status glass-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                    <h2 style="border: none; margin: 0; padding: 0;">종합 판정</h2>
+                    <span class="guide-link" id="full-guide-btn">전체 설명서 보기 📖</span>
+                </div>
+                <div class="status-content">
+                    <div id="overall-signal" class="signal-badge">계산 중...</div>
+                    <p id="overall-desc" class="signal-desc">데이터를 불러오는 중입니다.</p>
+                </div>
+                <div class="signal-counts">
+                    <span class="count-item"><span class="dot green"></span> 강세: <strong id="count-green">0</strong>개</span>
+                    <span class="count-item"><span class="dot yellow"></span> 주의: <strong id="count-yellow">0</strong>개</span>
+                    <span class="count-item"><span class="dot red"></span> 위험: <strong id="count-red">0</strong>개</span>
+                </div>
+                
+                <div class="overall-rules">
+                    <h3>종합 판정 규칙</h3>
+                    <ul>
+                        <li><span class="dot green"></span> 4개 이상 &rarr; 적극 매매 (정상 비중 100%)</li>
+                        <li><span class="dot green"></span> 3개 &rarr; 보통 매매 (비중 70%)</li>
+                        <li><span class="dot green"></span> 2개 이하 &rarr; 보수적 (비중 50%, 신규 진입 최소화)</li>
+                        <li><span class="dot red"></span> 2개 이상 &rarr; 강제 관망 (보유 종목 청산 규칙만 작동)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="main-chart glass-panel">
+                <h2>QQQ vs 50일 이동평균선 (최근 1년)</h2>
+                <div class="chart-wrapper">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="middle-section glass-panel">
+            <h2>5지표 신호등 상세</h2>
+            <p class="section-desc">각 지표를 클릭하면 하단에서 최근 1년 차트를 확인할 수 있습니다.</p>
+            <div class="indicators-list" id="indicators-container">
+                <!-- JS로 동적 생성됨 -->
+            </div>
+        </div>
+
+        <div class="bottom-section glass-panel">
+            <h2 id="detail-chart-title">지표를 선택하여 상세 차트 확인</h2>
+            <div id="detail-desc" class="detail-description"></div>
+            <div class="chart-wrapper">
+                <canvas id="detailChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Guide -->
+    <div id="guideModal" class="modal">
+        <div class="modal-content glass-panel">
+            <span class="close-btn">&times;</span>
+            <h2 id="modal-title">지표 가이드</h2>
+            <div id="modal-desc" class="modal-desc"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="mock-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
