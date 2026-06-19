@@ -2,8 +2,36 @@
 Chart.defaults.color = '#94a3b8';
 Chart.defaults.font.family = "'Inter', sans-serif";
 
-const data = window.mockData;
-const current = window.currentIndicators;
+let data = null;
+let current = null;
+let indicators = [];
+
+const loadData = async () => {
+    try {
+        // GitHub Pages 환경에서는 캐시 방지를 위해 쿼리 파라미터를 붙이는 것이 좋습니다.
+        const response = await fetch('data.json?t=' + new Date().getTime());
+        data = await response.json();
+        
+        current = {
+            qqq: data.qqq[data.qqq.length - 1],
+            qqq50ma: data.qqq50ma[data.qqq50ma.length - 1],
+            above200ma: data.above200ma[data.above200ma.length - 1],
+            highLow: data.highLow[data.highLow.length - 1],
+            vix: data.vix[data.vix.length - 1],
+            fearGreed: data.fearGreed[data.fearGreed.length - 1]
+        };
+        
+        indicators = evaluateIndicators();
+        evaluateOverall();
+        renderMainChart();
+        renderIndicatorsList();
+        
+    } catch (error) {
+        console.error("데이터 로드 실패:", error);
+        document.getElementById('overall-signal').innerText = "에러";
+        document.getElementById('overall-desc').innerText = "데이터를 불러오는 중 문제가 발생했습니다.";
+    }
+};
 
 // 1. 지표 평가 로직
 const evaluateIndicators = () => {
@@ -95,8 +123,6 @@ const evaluateIndicators = () => {
 
     return results;
 };
-
-const indicators = evaluateIndicators();
 
 // 2. 종합 판정 로직
 const evaluateOverall = () => {
@@ -281,9 +307,7 @@ const renderIndicatorsList = () => {
 
 // 초기화
 window.addEventListener('DOMContentLoaded', () => {
-    evaluateOverall();
-    renderMainChart();
-    renderIndicatorsList();
+    loadData();
 
     // 모달 닫기 이벤트 처리
     const modal = document.getElementById('guideModal');
