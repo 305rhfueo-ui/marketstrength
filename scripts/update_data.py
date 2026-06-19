@@ -129,8 +129,15 @@ def main():
         q50_val = float(q50_val_raw) if not pd.isna(q50_val_raw) else (output_qqq50ma[-1] if output_qqq50ma else q_val)
         v_val = float(v_val_raw) if not pd.isna(v_val_raw) else (output_vix[-1] if output_vix else 20)
         
-        a200_val = float(above_200ma_pct.loc[dt].item() if isinstance(above_200ma_pct.loc[dt], pd.Series) else above_200ma_pct.loc[dt]) if dt in above_200ma_pct.index and not pd.isna(above_200ma_pct.loc[dt]).any() else output_above200ma[-1] if output_above200ma else 50
-        nhnl_val = int(nahl_series.loc[dt].item() if isinstance(nahl_series.loc[dt], pd.Series) else nahl_series.loc[dt]) if dt in nahl_series.index and not pd.isna(nahl_series.loc[dt]).any() else output_highLow[-1] if output_highLow else 0
+        # Extract the scalar value cleanly
+        a200_val_raw = above_200ma_pct.loc[dt]
+        a200_val_raw = a200_val_raw.item() if isinstance(a200_val_raw, pd.Series) else a200_val_raw
+        
+        nhnl_val_raw = nahl_series.loc[dt]
+        nhnl_val_raw = nhnl_val_raw.item() if isinstance(nhnl_val_raw, pd.Series) else nhnl_val_raw
+        
+        a200_val = float(a200_val_raw) if dt in above_200ma_pct.index and not pd.isna(a200_val_raw) else (output_above200ma[-1] if output_above200ma else 50)
+        nhnl_val = int(nhnl_val_raw) if dt in nahl_series.index and not pd.isna(nhnl_val_raw) else (output_highLow[-1] if output_highLow else 0)
         
         fg_val = fg_dict.get(date_str)
         if fg_val is not None:
