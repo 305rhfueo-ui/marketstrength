@@ -20,6 +20,12 @@
                     <h2 style="border: none; margin: 0; padding: 0;">종합 판정</h2>
                     <span class="guide-link" id="full-guide-btn">전체 설명서 보기 📖</span>
                 </div>
+                <div class="date-selector-wrapper" style="margin-bottom: 1rem; display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                    <label for="date-select" style="font-weight: 500; font-size: 0.9rem; color: #cbd5e1;">기준일:</label>
+                    <select id="date-select" class="date-select-dropdown">
+                        <option value="">데이터 불러오는 중...</option>
+                    </select>
+                </div>
                 <div class="status-content">
                     <div id="overall-signal" class="signal-badge">계산 중...</div>
                     <p id="overall-desc" class="signal-desc">데이터를 불러오는 중입니다.</p>

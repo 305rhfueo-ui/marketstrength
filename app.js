@@ -12,25 +12,50 @@ const loadData = async () => {
         const response = await fetch('data.json?t=' + new Date().getTime());
         data = await response.json();
         
-        current = {
-            qqq: data.qqq[data.qqq.length - 1],
-            qqq50ma: data.qqq50ma[data.qqq50ma.length - 1],
-            above200ma: data.above200ma[data.above200ma.length - 1],
-            highLow: data.highLow[data.highLow.length - 1],
-            vix: data.vix[data.vix.length - 1],
-            fearGreed: data.fearGreed[data.fearGreed.length - 1]
-        };
+        const dateSelect = document.getElementById('date-select');
+        if (dateSelect) {
+            dateSelect.innerHTML = '';
+            // 최신 날짜가 위로 오도록 역순으로 추가
+            for (let i = data.dates.length - 1; i >= 0; i--) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.text = data.dates[i];
+                dateSelect.appendChild(option);
+            }
+            
+            dateSelect.addEventListener('change', (e) => {
+                const selectedIndex = parseInt(e.target.value);
+                updateDataForDate(selectedIndex);
+            });
+        }
         
-        indicators = evaluateIndicators();
-        evaluateOverall();
+        // 차트는 한 번만 렌더링
         renderMainChart();
-        renderIndicatorsList();
+        
+        // 초기 로드: 가장 최신 날짜로 데이터 세팅
+        updateDataForDate(data.dates.length - 1);
         
     } catch (error) {
         console.error("데이터 로드 실패:", error);
         document.getElementById('overall-signal').innerText = "에러";
         document.getElementById('overall-desc').innerText = "데이터를 불러오는 중 문제가 발생했습니다.";
     }
+};
+
+const updateDataForDate = (index) => {
+    current = {
+        date: data.dates[index],
+        qqq: data.qqq[index],
+        qqq50ma: data.qqq50ma[index],
+        above200ma: data.above200ma[index],
+        highLow: data.highLow[index],
+        vix: data.vix[index],
+        fearGreed: data.fearGreed[index]
+    };
+    
+    indicators = evaluateIndicators();
+    evaluateOverall();
+    renderIndicatorsList();
 };
 
 // 1. 지표 평가 로직

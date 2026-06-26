@@ -154,21 +154,61 @@ def main():
         output_highLow.append(nhnl_val)
         output_fearGreed.append(round(last_valid_fg, 2))
 
-    # 8. Export to JSON
-    data = {
-        "dates": output_dates,
-        "qqq": output_qqq,
-        "qqq50ma": output_qqq50ma,
-        "above200ma": output_above200ma,
-        "highLow": output_highLow,
-        "vix": output_vix,
-        "fearGreed": output_fearGreed
+    # 8. Export to JSON (with accumulation)
+    import os
+    existing_data = {
+        "dates": [], "qqq": [], "qqq50ma": [], 
+        "above200ma": [], "highLow": [], "vix": [], "fearGreed": []
     }
+    if os.path.exists('data.json'):
+        try:
+            with open('data.json', 'r') as f:
+                loaded = json.load(f)
+                # Ensure all keys exist in loaded data
+                if all(k in loaded for k in existing_data.keys()):
+                    existing_data = loaded
+        except Exception as e:
+            print(f"Failed to load existing data.json: {e}")
+
+    # Merge new data into existing_data
+    for idx, d_str in enumerate(output_dates):
+        if d_str in existing_data["dates"]:
+            # Update existing date index
+            e_idx = existing_data["dates"].index(d_str)
+            existing_data["qqq"][e_idx] = output_qqq[idx]
+            existing_data["qqq50ma"][e_idx] = output_qqq50ma[idx]
+            existing_data["above200ma"][e_idx] = output_above200ma[idx]
+            existing_data["highLow"][e_idx] = output_highLow[idx]
+            existing_data["vix"][e_idx] = output_vix[idx]
+            existing_data["fearGreed"][e_idx] = output_fearGreed[idx]
+        else:
+            # Append new date
+            existing_data["dates"].append(d_str)
+            existing_data["qqq"].append(output_qqq[idx])
+            existing_data["qqq50ma"].append(output_qqq50ma[idx])
+            existing_data["above200ma"].append(output_above200ma[idx])
+            existing_data["highLow"].append(output_highLow[idx])
+            existing_data["vix"].append(output_vix[idx])
+            existing_data["fearGreed"].append(output_fearGreed[idx])
+
+    # Sort data by dates to ensure chronological order
+    sorted_pairs = sorted(zip(
+        existing_data["dates"], existing_data["qqq"], existing_data["qqq50ma"], 
+        existing_data["above200ma"], existing_data["highLow"], existing_data["vix"], existing_data["fearGreed"]
+    ), key=lambda x: x[0])
     
+    existing_data["dates"] = [p[0] for p in sorted_pairs]
+    existing_data["qqq"] = [p[1] for p in sorted_pairs]
+    existing_data["qqq50ma"] = [p[2] for p in sorted_pairs]
+    existing_data["above200ma"] = [p[3] for p in sorted_pairs]
+    existing_data["highLow"] = [p[4] for p in sorted_pairs]
+    existing_data["vix"] = [p[5] for p in sorted_pairs]
+    existing_data["fearGreed"] = [p[6] for p in sorted_pairs]
+
     with open('data.json', 'w') as f:
-        json.dump(data, f)
+        json.dump(existing_data, f)
         
-    print("Successfully generated data.json")
+    print("Successfully generated and accumulated data.json")
 
 if __name__ == "__main__":
     main()
