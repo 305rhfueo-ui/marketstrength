@@ -55,6 +55,8 @@ def main():
     # 2. Fetch QQQ and VIX
     print("Fetching QQQ and VIX...")
     qqq = yf.download('QQQ', start=fetch_start_date, end=end_date)
+    import time
+    time.sleep(2)
     vix = yf.download('^VIX', start=fetch_start_date, end=end_date)
     
     if qqq.empty or vix.empty:
@@ -75,10 +77,24 @@ def main():
     # 3. Fetch Nasdaq 100 Components
     tickers = get_nasdaq_100_tickers()
     tickers = [t.replace('.', '-') for t in tickers] # yfinance uses '-' for classes
-    print(f"Fetching data for {len(tickers)} Nasdaq 100 components...")
+    import time
     
-    ndx_data = yf.download(tickers, start=fetch_start_date, end=end_date)['Close']
-    
+    ndx_close_series = []
+    print(f"Fetching data for {len(tickers)} Nasdaq 100 components slowly to avoid rate limits...")
+    for t in tickers:
+        try:
+            data = yf.download(t, start=fetch_start_date, end=end_date)
+            if not data.empty and 'Close' in data:
+                series = data['Close']
+                if isinstance(series, pd.DataFrame):
+                    series = series.squeeze()
+                series.name = t
+                ndx_close_series.append(series)
+            time.sleep(2)  # Delay of 2 seconds
+        except Exception as e:
+            print(f"Error fetching {t}: {e}")
+            
+    ndx_data = pd.concat(ndx_close_series, axis=1) if ndx_close_series else pd.DataFrame()
     # 4. Calculate % Above 200MA
     print("Calculating % Above 200MA...")
     ndx_200ma = ndx_data.rolling(window=200).mean()
